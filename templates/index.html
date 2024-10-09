@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Activation and Betting</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #user-section {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .user-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 30%;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .user-card h2 {
+            margin-top: 0;
+        }
+
+        .user-card p {
+            margin: 8px 0;
+        }
+
+        h3 {
+            margin-top: 20px;
+        }
+
+        .reduce-button {
+            padding: 10px 15px; /* Button padding */
+            margin: 20px 0; /* Margin for spacing */
+            border: none; /* Remove default border */
+            background-color: #6f42c1; /* Purple */
+            color: white; /* Text color */
+            cursor: pointer; /* Pointer cursor */
+            font-size: 16px; /* Increase font size for better visibility */
+        }
+
+
+        button {
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-right: 5px;
+            margin-bottom: 6px;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        ul li button {
+            background-color: #28a745;
+            margin-left: 10px;
+        }
+
+        ul li button:nth-child(3) {
+            background-color: #dc3545;
+        }
+
+        /* User-specific button colors */
+        .user1-button {
+            background-color: #007bff; /* Blue */
+        }
+
+        .user2-button {
+            background-color: #17a2b8; /* Teal */
+        }
+
+        .user3-button {
+            background-color: #ffc107; /* Yellow */
+        }
+    </style>
+</head>
+<body>
+    <h1>Funbucks Tracker</h1>
+    <div id="user-section">
+        <!-- User 1 -->
+        <div class="user-card" id="user1">
+            <h2>{{ user_data.User1.username }}</h2>
+            <form action="/update_username" method="POST">
+                <input type="hidden" name="user" value="User1"> <!-- Specify the user -->
+                <input type="text" id="username_User1" name="username" placeholder="Set Username for User 1" value="{{ user_data.User1.username }}" required>
+                <button type="submit">Update Username</button>
+            </form>
+            <p>Funbucks: <span id="funbucks_User1">{{ user_data.User1.funbucks }}</span></p>
+
+            <!-- Power Activation Buttons -->
+            <h3>Activate Powers</h3>
+            <form action="/activate" method="POST">
+                <input type="hidden" name="user" value="User1">
+                <button type="submit" name="power" value="Innate" class="user1-button">Activate Innate</button>
+                <button type="submit" name="power" value="Artifact" class="user1-button">Activate Artifact</button>
+                <button type="submit" name="power" value="Consumable" class="user1-button">Activate Consumable</button>
+                <button type="submit" name="power" value="Legendary" class="user1-button">Activate Legendary</button>
+            </form>
+
+            <!-- Power levels display -->
+            <p>Innate: <span id="innate_User1">{{ user_data.User1.powers.Innate }}</span> <span id="bonuses_innate_User1">(+{{ bonuses.Innate }})</span></p>
+            <p>Artifact: <span id="Artifact_User1">{{ user_data.User1.powers.Artifact }}</span> <span id="bonuses_Artifact_User1">(+{{ bonuses.Artifact }})</span></p>
+            <p>Legendary: <span id="legendary_User1">{{ user_data.User1.powers.Legendary }}</span> <span id="bonuses_legendary_User1">(+{{ bonuses.Legendary }})</span></p>
+            <p>Consumable: <span id="consumable_User1">{{ user_data.User1.powers.Consumable }}</span> <span id="bonuses_consumable_User1">(+{{ bonuses.Consumable }})</span></p>
+
+            <!-- Betting Section -->
+            <h3>Place Bet</h3>
+            <form action="/place_bet" method="POST">
+                <input type="hidden" name="user" value="User1">
+                <input type="text" name="bet_description" placeholder="Bet description" required>
+                <input type="number" name="bet_amount" placeholder="Bet amount" required>
+                <button type="submit">Place Bet</button>
+            </form>
+
+            <!-- Current Bets -->
+            <h3>Current Bets</h3>
+            <ul id="bets_User1">
+                {% for bet in user_data.User1.bets %}
+                <li>
+                    {{ bet.description }} - ${{ bet.amount }}
+                    <form action="/resolve_bet" method="POST" style="display:inline;">
+                        <input type="hidden" name="user" value="User1">
+                        <input type="hidden" name="betIndex" value="{{ loop.index0 }}">
+                        <button type="submit" name="result" value="win">Win</button>
+                        <button type="submit" name="result" value="lose">Lose</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- User 2 -->
+        <div class="user-card" id="user2">
+            <h2>{{ user_data.User2.username }}</h2>
+            <form action="/update_username" method="POST">
+                <input type="hidden" name="user" value="User2"> <!-- Specify the user -->
+                <input type="text" id="username_User2" name="username" placeholder="Set Username for User 2" value="{{ user_data.User2.username }}" required>
+                <button type="submit">Update Username</button>
+            </form>
+            <p>Funbucks: <span id="funbucks_User2">{{ user_data.User2.funbucks }}</span></p>
+
+            <!-- Power Activation Buttons -->
+            <h3>Activate Powers</h3>
+            <form action="/activate" method="POST">
+                <input type="hidden" name="user" value="User2">
+                <button type="submit" name="power" value="Innate" class="user2-button">Activate Innate</button>
+                <button type="submit" name="power" value="Artifact" class="user2-button">Activate Artifact</button>
+                <button type="submit" name="power" value="Consumable" class="user2-button">Activate Consumable</button>
+                <button type="submit" name="power" value="Legendary" class="user2-button">Activate Legendary</button>
+            </form>
+
+            <!-- Power levels display -->
+            <p>Innate: <span id="innate_User2">{{ user_data.User2.powers.Innate }}</span> <span id="bonuses_innate_User2">(+{{ bonuses.Innate }})</span></p>
+            <p>Artifact: <span id="artifact_User2">{{ user_data.User2.powers.Artifact }}</span> <span id="bonuses_Artifact_User2">(+{{ bonuses.Artifact }})</span></p>
+            <p>Legendary: <span id="legendary_User2">{{ user_data.User2.powers.Legendary }}</span> <span id="bonuses_legendary_User2">(+{{ bonuses.Legendary }})</span></p>
+            <p>Consumable: <span id="consumable_User2">{{ user_data.User2.powers.Consumable }}</span> <span id="bonuses_consumable_User2">(+{{ bonuses.Consumable }})</span></p>
+
+            <!-- Betting Section -->
+            <h3>Place Bet</h3>
+            <form action="/place_bet" method="POST">
+                <input type="hidden" name="user" value="User2">
+                <input type="text" name="bet_description" placeholder="Bet description" required>
+                <input type="number" name="bet_amount" placeholder="Bet amount" required>
+                <button type="submit">Place Bet</button>
+            </form>
+
+            <!-- Current Bets -->
+            <h3>Current Bets</h3>
+            <ul id="bets_User2">
+                {% for bet in user_data.User2.bets %}
+                <li>
+                    {{ bet.description }} - ${{ bet.amount }}
+                    <form action="/resolve_bet" method="POST" style="display:inline;">
+                        <input type="hidden" name="user" value="User2">
+                        <input type="hidden" name="betIndex" value="{{ loop.index0 }}">
+                        <button type="submit" name="result" value="win">Win</button>
+                        <button type="submit" name="result" value="lose">Lose</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- User 3 -->
+        <div class="user-card" id="user3">
+            <h2>{{ user_data.User3.username }}</h2>
+            <form action="/update_username" method="POST">
+                <input type="hidden" name="user" value="User3"> <!-- Specify the user -->
+                <input type="text" id="username_User3" name="username" placeholder="Set Username for User 3" value="{{ user_data.User3.username }}" required>
+                <button type="submit">Update Username</button>
+            </form>
+            <p>Funbucks: <span id="funbucks_User3">{{ user_data.User3.funbucks }}</span></p>
+
+            <!-- Power Activation Buttons -->
+            <h3>Activate Powers</h3>
+            <form action="/activate" method="POST">
+                <input type="hidden" name="user" value="User3">
+                <button type="submit" name="power" value="Innate" class="user3-button">Activate Innate</button>
+                <button type="submit" name="power" value="Artifact" class="user3-button">Activate Artifact</button>
+                <button type="submit" name="power" value="Consumable" class="user3-button">Activate Consumable</button>
+                <button type="submit" name="power" value="Legendary" class="user3-button">Activate Legendary</button>
+            </form>
+
+            <!-- Power levels display -->
+            <p>Innate: <span id="innate_User3">{{ user_data.User3.powers.Innate }}</span> <span id="bonuses_innate_User3">(+{{ bonuses.Innate }})</span></p>
+            <p>Artifact: <span id="artifact_User3">{{ user_data.User3.powers.Artifact }}</span> <span id="bonuses_Artifact_User3">(+{{ bonuses.Artifact }})</span></p>
+            <p>Legendary: <span id="legendary_User3">{{ user_data.User3.powers.Legendary }}</span> <span id="bonuses_legendary_User3">(+{{ bonuses.Legendary }})</span></p>
+            <p>Consumable: <span id="consumable_User3">{{ user_data.User3.powers.Consumable }}</span> <span id="bonuses_consumable_User3">(+{{ bonuses.Consumable }})</span></p>
+
+            <!-- Betting Section -->
+            <h3>Place Bet</h3>
+            <form action="/place_bet" method="POST">
+                <input type="hidden" name="user" value="User3">
+                <input type="text" name="bet_description" placeholder="Bet description" required>
+                <input type="number" name="bet_amount" placeholder="Bet amount" required>
+                <button type="submit">Place Bet</button>
+            </form>
+
+            <!-- Current Bets -->
+            <h3>Current Bets</h3>
+            <ul id="bets_User3">
+                {% for bet in user_data.User3.bets %}
+                <li>
+                    {{ bet.description }} - ${{ bet.amount }}
+                    <form action="/resolve_bet" method="POST" style="display:inline;">
+                        <input type="hidden" name="user" value="User3">
+                        <input type="hidden" name="betIndex" value="{{ loop.index0 }}">
+                        <button type="submit" name="result" value="win">Win</button>
+                        <button type="submit" name="result" value="lose">Lose</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+            <!-- Reduce Powers Button -->
+    <form action="/reduce_powers" method="POST">
+        <button type="submit" class="reduce-button">Reduce Powers</button>
+    </form>
+    </div>
+</body>
+</html>
