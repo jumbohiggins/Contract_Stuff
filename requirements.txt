@@ -1,6 +1,7 @@
 Flask
 render_template
-request, redirect
+request
+redirect
 jsonify
 flash
 url_for
