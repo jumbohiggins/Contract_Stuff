@@ -70,6 +70,7 @@ def index():
         for user, data in user_data.items():
             data['power_display'] = get_power_display(data['power_value'])
 
+    print("FSDasdf")
     return render_template('index.html', user_data=user_data, user_colors=user_colors, bonuses=bonuses)
 
 @app.route('/reduce_powers', methods=['POST'])
