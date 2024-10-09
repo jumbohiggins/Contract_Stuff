@@ -1,5 +1,4 @@
 Flask==2.3.2
-request
 redirect
 jsonify
 flash
